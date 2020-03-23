@@ -77,6 +77,7 @@ const Flashcard = () => {
     //const [index, setIndex] = useState(-1);
     //const [cardContent, setCardContent] = useState("");
     //const [showAnswer, setShowAnswer] = useState(false);
+    const [myError, setMyError] = useState(false);
     const [{ data, loading, error }, executePost] = useAxios({
             url: process.env.REACT_APP_API_URL + "/api/deck",
             method: 'post',
@@ -96,10 +97,21 @@ const Flashcard = () => {
                 console.log(quiz)
             }
             setQuestions(questions);
-            //setCardContent(questions[0].a_side);
-            //setIndex(0);
+            setMyError(false);
+        } else {
+            if (error) {
+                setMyError(true);
+            }
         }
-    }, [data]);
+
+
+        /*
+        const timer = setTimeout(() => {
+        }, 3000);
+        return () => clearTimeout(timer);
+         */
+
+    }, [data, error]);
 
     /*
     const PrevQuestion = () => {
@@ -130,19 +142,19 @@ const Flashcard = () => {
             console.log(error);
         }
         //<Grid container spacing={4} justify="center">
+        //{url && (questions !== []) && <Alert severity="info">Flashcards loaded from {url} </Alert>}
         return (
             <>
                 {loading && <Alert severity="info">Loading...</Alert>}
                 {error && <Alert severity="info">Error sending requests...</Alert>}
-                {url && (questions !== []) && <Alert severity="info">Flashcards loaded from {url} </Alert>}
             </>
         )
     };
 
-    const LoadDeck = () => {
+    const LoadDeck = (url) => {
         executePost({
             data: {
-                url: "test_url"
+                url: url,
             },
             headers: {'Content-Type':'application/json'}
         });
@@ -218,7 +230,7 @@ const Flashcard = () => {
             <Grid container spacing={1} justify="center">
 
                 <Grid item xs={8}>
-                    <StatusBar error={error} loading={loading}/>
+                    <StatusBar error={myError} loading={loading}/>
                 </Grid>
 
                 <Grid item xs={8}>
@@ -241,7 +253,7 @@ const Flashcard = () => {
                     </Paper>
                 </Grid>
                 <Grid item xs={2}>
-                    <Button disableElevation variant="contained" color="primary" onClick={()=>{LoadDeck()}}>Load Flashcards</Button>
+                    <Button disableElevation variant="contained" color="primary" onClick={()=>{LoadDeck(url)}}>Load Flashcards</Button>
                 </Grid>
 
                 {LoadExpansionPanels()}
@@ -252,4 +264,4 @@ const Flashcard = () => {
     );
 }
 
-export default Flashcard
+export default Flashcard;
