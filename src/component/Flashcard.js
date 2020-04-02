@@ -61,7 +61,7 @@ const useStyles = makeStyles(theme => ({
         marginRight: theme.spacing(1),
     },
     heading: {
-        color: 'black',
+        color: 'blue',
         fontSize: theme.typography.pxToRem(15),
         fontWeight: theme.typography.fontWeightRegular,
     },
@@ -74,9 +74,6 @@ const useStyles = makeStyles(theme => ({
 const Flashcard = () => {
     const [url, setURL] = useInput("");
     const [questions, setQuestions] = useState([]);
-    //const [index, setIndex] = useState(-1);
-    //const [cardContent, setCardContent] = useState("");
-    //const [showAnswer, setShowAnswer] = useState(false);
     const [myError, setMyError] = useState(false);
     const [{ data, loading, error }, executePost] = useAxios({
             url: process.env.REACT_APP_API_URL + "/api/deck",
@@ -88,13 +85,11 @@ const Flashcard = () => {
 
     useEffect(() => {
         var questions = [];
-        console.log(data);
         if (data) {
             let cards = data.flashcards;
             for (var i=0; i<cards.length; i++) {
-                let quiz = {a_side:cards[i].front, b_side:cards[i].back};
+                let quiz = {a_side:"### Q" + (i+1) + " - " + cards[i].front.split("###")[1], b_side:cards[i].back};
                 questions.push(quiz);
-                console.log(quiz)
             }
             setQuestions(questions);
             setMyError(false);
@@ -103,14 +98,6 @@ const Flashcard = () => {
                 setMyError(true);
             }
         }
-
-
-        /*
-        const timer = setTimeout(() => {
-        }, 3000);
-        return () => clearTimeout(timer);
-         */
-
     }, [data, error]);
 
     /*
@@ -141,8 +128,6 @@ const Flashcard = () => {
         if (error) {
             console.log(error);
         }
-        //<Grid container spacing={4} justify="center">
-        //{url && (questions !== []) && <Alert severity="info">Flashcards loaded from {url} </Alert>}
         return (
             <>
                 {loading && <Alert severity="info">Loading...</Alert>}
@@ -160,9 +145,9 @@ const Flashcard = () => {
         });
     }
 
-    const LoadPanel = (flashcard) => {
+    const LoadPanel = (index, flashcard) => {
         return (
-            <div className={classes.panel}>
+            <div key={"q_"+index} className={classes.panel}>
                 <ExpansionPanel>
                     <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
                         <Typography className={classes.heading}>
@@ -183,47 +168,10 @@ const Flashcard = () => {
     const LoadExpansionPanels = () => {
         var output = [];
         for (var i=0; i<questions.length; i++) {
-            output.push(LoadPanel(questions[i]));
+            output.push(LoadPanel(i, questions[i]));
         }
         return output;
     }
-
-    /*
-
-<Grid container spacing={3} justify="center">
-                <Grid item xs={8}>
-                    <Paper className={classes.paper}>
-                        <Box max-height={100}>
-                            <ReactMarkdown source={cardContent} />
-                        </Box>
-                    </Paper>
-                </Grid>
-            </Grid>
-
-            <Grid container spacing={3} justify="center">
-                <Grid item xs={8}>
-                    <Paper className={classes.paper}>
-                        <Box height={150}>
-                            <Typography align="left">
-                            {showAnswer && <ReactMarkdown source={questions[index].b_side} renderers={{code:CodeBlock}} />}
-                            </Typography>
-                        </Box>
-                    </Paper>
-                </Grid>
-            </Grid>
-
-            <Grid container spacing={3} justify="center">
-                <Grid item xs={8}>
-                    <Paper className={classes.paper}>
-                        <Button className={classes.margin} disableElevation size="large" variant="contained" color="primary" onClick={()=>{PrevQuestion()}}>Previous Card</Button>
-                        <Button className={classes.margin} disableElevation size="large" variant="contained" color="primary" onClick={()=>{setShowAnswer(true)}}>Show Answer</Button>
-                        <Button className={classes.margin} disableElevation size="large" variant="contained" color="primary" onClick={()=>{NextQuestion()}}>Next Card</Button>
-                    </Paper>
-                </Grid>
-            </Grid>
-
-
-     */
 
     return (
         <div className={classes.root}>

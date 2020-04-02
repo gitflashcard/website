@@ -2,25 +2,33 @@ version: '3'
 
 services:
 
-  frontend-base:
+  web-base:
     build:
       context: .
-      dockerfile: Dockerfile_frontend
-    image: frontend-base/gitflashcard:0.1
-    container_name: frontend-base-gitflashcard
+      dockerfile: Dockerfile_web_base
+    image: web-base/gitflashcard:0.1
+    container_name: web-base-gitflashcard
 
-  frontend-dev:
-    image: frontend-base/gitflashcard:0.1
-    container_name: frontend-dev-gitflashcard
+  web-dev:
+    image: web-base/gitflashcard:0.1
+    container_name: web-dev-gitflashcard
     volumes:
-      - .:/frontend
-    working_dir: /frontend
+      - .:/website
+    working_dir: /website
+    tty: true
     ports:
-      - "80:3000"
-    command: /bin/sh -c "npm run start:local"
+      - "3000:3000"
+    command: /bin/sh -c "npm run start"
     depends_on:
-      - frontend-base
+      - web-base
 
-networks:
-  backend:
-    driver: "bridge"
+  web-build:
+    image: web-base/gitflashcard:0.1
+    container_name: web-build-gitflashcard
+    volumes:
+      - .:/website
+    working_dir: /website
+    tty: true
+    command: /bin/sh -c "npm install && npm run build"
+    depends_on:
+      - web-base
