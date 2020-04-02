@@ -22,6 +22,17 @@ services:
     depends_on:
       - web-base
 
+  web-install:
+    image: web-base/gitflashcard:0.1
+    container_name: web-install-gitflashcard
+    volumes:
+      - .:/website
+    working_dir: /website
+    tty: true
+    command: /bin/sh -c "npm install"
+    depends_on:
+      - web-base
+
   web-build:
     image: web-base/gitflashcard:0.1
     container_name: web-build-gitflashcard
@@ -29,6 +40,6 @@ services:
       - .:/website
     working_dir: /website
     tty: true
-    command: /bin/sh -c "npm install && npm run build"
+    command: /bin/sh -c "npm run build"
     depends_on:
       - web-base
